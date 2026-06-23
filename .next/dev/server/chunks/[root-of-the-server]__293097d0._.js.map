@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 40, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/GEDEON-XPS/Desktop/Next%201st/nextjs-dashboard/nextdashboard/app/seed/route.ts"],"sourcesContent":["export async function GET() {\n  return Response.json({ message: \"Hello from seed route\" });\n}\n"],"names":[],"mappings":";;;;AAAO,eAAe;IACpB,OAAO,SAAS,IAAI,CAAC;QAAE,SAAS;IAAwB;AAC1D"}}]
-}
