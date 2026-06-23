@@ -79,7 +79,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Premium Onboarding</title>
+        <title>Taskit Onboarding</title>
         <meta name="description" content="Modern onboarding experience" />
         <meta name="theme-color" content="#F8A01B" />
       </head>
