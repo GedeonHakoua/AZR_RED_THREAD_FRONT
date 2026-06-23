@@ -26,8 +26,9 @@ export default function OptionCard({
       onClick={onClick}
       sx={{
         p: 3,
+        mb: 1,
         cursor: onClick ? 'pointer' : 'default',
-        borderRadius: 2,
+        borderRadius: 1.5,
         border: selected ? '2px solid #F8A01B' : '1px solid #E0E0E0',
         background: selected ? 'rgba(248, 160, 27, 0.05)' : 'white',
         transition: 'all 0.3s ease',

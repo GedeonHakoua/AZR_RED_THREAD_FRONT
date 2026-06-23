@@ -8,35 +8,35 @@ import {
   Typography,
   Container,
   Stack,
+  Switch,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useRouter } from 'next/navigation'
+import ThemeContext from '../../lib/ThemeContext'
 // Imports des composants locaux personnalisés pour l'onboarding
 import StepContainer from './components/StepContainer' // Wrapper pour chaque étape (titre + description)
 import ProgressIndicator from './components/ProgressIndicator' // Indicateur de progression visuel
 import OptionCard from './components/OptionCard' // Carte cliquable pour les sélections multiples
 
 // Nombre total d'étapes du processus d'onboarding
-const TOTAL_STEPS = 7
+const TOTAL_STEPS = 9
 
 // Composant principal de la page d'onboarding - gère les 7 étapes de configuration du profil utilisateur
 export default function OnboardingPage() {
   // État pour suivre l'étape actuelle du flux d'onboarding (1 à 7)
   const [currentStep, setCurrentStep] = useState(1)
 
-  // État pour les données textuelles du formulaire (étapes 1-2, et email d'invitation)
+  // État pour les données textuelles du formulaire (username, company, inviteEmail)
   const [formData, setFormData] = useState<{
-    firstName: string
-    lastName: string
+    username: string
     company: string
     inviteEmail: string
   }>({
-    firstName: '', // Prénom de l'utilisateur (étape 1)
-    lastName: '', // Nom de l'utilisateur (étape 1)
+    username: '', // Username (étape 1)
     company: '', // Entreprise (étape 2)
-    inviteEmail: '', // Email pour inviter une personne (nouvelle étape 5)
+    inviteEmail: '', // Email pour inviter une personne (étape 7)
   })
 
   // État pour les sélections d'options (étapes 3,4 et 6)
@@ -44,14 +44,20 @@ export default function OnboardingPage() {
     role: string
     industry: string
     goals: string[]
+    style: string
   }>({
     role: '', // Rôle sélectionné (simple choix)
     industry: '', // Industrie sélectionnée (simple choix)
     goals: [], // Tableau des objectifs sélectionnés (multi-sélection)
+    style: 'Light', // Style choisi (étape 6)
   })
 
   // État pour l'invitation : si l'utilisateur a effectivement envoyé l'invitation
   const [inviteSent, setInviteSent] = useState(false)
+
+  // États pour la souscription aux mises à jour (étape 8)
+  const [subscribeChangelog, setSubscribeChangelog] = useState(true)
+  const [subscribeMarketing, setSubscribeMarketing] = useState(false)
 
   // État pour afficher la page de chargement stylée après Get Started
   const [isCompleting, setIsCompleting] = useState(false)
@@ -63,9 +69,12 @@ export default function OnboardingPage() {
   // Hook pour détecter si l'écran est mobile (breakpoint < md) - actuellement non utilisé
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  // Récupère le setter de thème global depuis le context pour appliquer instantanément
+  const { setMode } = useContext(ThemeContext)
+
   // Fonction pour mettre à jour un champ de texte dans formData
   // Utilisée par les TextField (firstName, lastName, company)
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value, // Met à jour le champ spécifié sans modifier les autres
@@ -74,7 +83,7 @@ export default function OnboardingPage() {
 
   // Fonction pour sélectionner une option simple (role, industry, experience)
   // Remplace la valeur précédente par la nouvelle (simple choix, pas multi-sélection)
-  const handleOptionSelect = (field: string, value: string) => {
+  const handleOptionSelect = (field: 'role' | 'industry' | 'style', value: string) => {
     setSelectedOptions((prev) => ({
       ...prev,
       [field]: value, // Remplace l'ancienne sélection
@@ -109,19 +118,25 @@ export default function OnboardingPage() {
   // Chaque étape a ses propres critères de validation
   const canProceedToNextStep = () => {
     switch (currentStep) {
-      case 1: // Étape 1 : prénom et nom obligatoires
-        return formData.firstName.trim() && formData.lastName.trim()
+      case 1: // Étape 1 : nom d'utilisateur obligatoire
+        return formData.username.trim().length > 0
       case 2: // Étape 2 : entreprise obligatoire
-        return formData.company.trim()
+        return formData.company.trim().length > 0
       case 3: // Étape 3 : rôle sélectionné obligatoire
-        return selectedOptions.role
+        return !!selectedOptions.role
       case 4: // Étape 4 : industrie sélectionnée obligatoire
-        return selectedOptions.industry
-      case 5: // Étape 5 : invitation envoyée (nouvelle étape)
-        return inviteSent
-      case 6: // Étape 6 : au moins un objectif sélectionné
+        return !!selectedOptions.industry
+      case 5: // Étape 5 : objectifs (au moins un)
         return selectedOptions.goals.length > 0
-      default: // Étape 7 : pas de validation (écran de complétion)
+      case 6: // Étape 6 : style choisi
+        return !!selectedOptions.style
+      case 7: // Étape 7 : invite (optionnel)
+        return true
+      case 8: // Étape 8 : subscribe (optionnel)
+        return true
+      case 9: // Étape 9 : final
+        return true
+      default:
         return true
     }
   }
@@ -164,73 +179,55 @@ export default function OnboardingPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(ellipse at center, #020617 0%, #000814 60%)',
-          color: '#e6f7ff',
+          background: `radial-gradient(ellipse at center, ${theme.palette.primary.main}1A 0%, ${theme.palette.secondary.main}1A 60%)`,
+          color: theme.palette.mode === 'light' ? '#0b1220' : '#e6f7ff',
           zIndex: 1400,
         }}
       >
-        <Box sx={{ textAlign: 'center' }}>
-          <Box
-            sx={{
-              width: 260,
-              height: 260,
-              mx: 'auto',
-              mb: 3,
-              borderRadius: '50%',
-              background: 'conic-gradient(from 90deg, #00f0ff, #8b5cff, #ff6ec7, #00f0ff)',
-              boxShadow: '0 0 80px rgba(139,92,255,0.15), inset 0 0 40px rgba(0,240,255,0.08)',
-              position: 'relative',
-              '@keyframes pulseRing': {
-                '0%': { transform: 'scale(1)', opacity: 0.9 },
-                '50%': { transform: 'scale(1.08)', opacity: 0.6 },
-                '100%': { transform: 'scale(1)', opacity: 0.9 },
-              },
-              animation: 'pulseRing 2.4s ease-in-out infinite',
-            }}
-          >
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 28,
-                borderRadius: '50%',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2))',
-                backdropFilter: 'blur(6px)',
-                boxShadow: 'inset 0 2px 20px rgba(0,0,0,0.6)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: '2.2rem',
-                fontWeight: 700,
-              }}
-            >
-              ⚡
-            </Box>
-          </Box>
-
-          <Box sx={{ mb: 1 }}>
-            <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.6px' }}>
-              Initialisation en cours
-            </Typography>
-          </Box>
-          <Typography sx={{ color: '#9fb8ff', mb: 2 }}>
-            Nous préparons votre espace numérique. Patientez quelques instants...
+        <Box sx={{ textAlign: 'center', width: '100%', maxWidth: 720, mx: 'auto' }}>
+          <Typography sx={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.6px', mb: 2 }}>
+            Launching Taskit
           </Typography>
-          <Box sx={{ height: 8, width: 420, mx: 'auto', borderRadius: 99, background: 'rgba(255,255,255,0.04)' }}>
+
+          <Typography sx={{ color: theme.palette.mode === 'light' ? '#5d4a2a' : '#9fb8ff', mb: 3 }}>
+            Preparing your workspace — just a moment...
+          </Typography>
+
+          <Box sx={{ mx: 'auto', width: 520, overflow: 'hidden', borderRadius: 2, bgcolor: theme.palette.background.paper, py: 2 }}>
             <Box
               sx={{
-                height: '100%',
-                width: '100%',
-                background: 'linear-gradient(90deg, #00f0ff, #8b5cff, #ff6ec7)',
-                borderRadius: 99,
-                transformOrigin: 'left',
-                animation: 'loadStrip 5s linear forwards',
-                '@keyframes loadStrip': {
-                  '0%': { transform: 'scaleX(0)' },
-                  '100%': { transform: 'scaleX(1)' },
+                display: 'flex',
+                gap: 3,
+                alignItems: 'center',
+                width: 'max-content',
+                mx: 'auto',
+                transform: 'translateX(0%)',
+                animation: 'slideIcons 5s linear forwards',
+                '@keyframes slideIcons': {
+                  '0%': { transform: 'translateX(0%)' },
+                  '100%': { transform: 'translateX(-50%)' },
                 },
               }}
-            />
+            >
+              {['🚀', '🛰️', '✨', '⚡', '🧭', '🚀', '🛰️', '✨', '⚡', '🧭'].map((icon, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: 2,
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2rem',
+                    boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+                  }}
+                >
+                  {icon}
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -268,41 +265,27 @@ export default function OnboardingPage() {
         {/* Indicateur de progression visuel (barre/points) */}
         <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        {/* ÉTAPE 1 : Informations de base (prénom, nom) */}
+        {/* ÉTAPE 1 : Informations de base (username) */}
         {currentStep === 1 && (
           <StepContainer
             stepNumber={1}
-            title="What&apos;s your name?"
-            description="Let us know who we&apos;re working with"
+            title="What's your name?"
+            description="Let us know who we're working with"
           >
-            <Stack gap={2} sx={{ mb: 4 }}>
-              {/* Champ pour le prénom */}
+            <Stack spacing={2} sx={{ mb: 4 }}>
               <TextField
                 fullWidth
-                label="First Name"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                placeholder="John"
-                sx={{
-                  '& .MuiOutlinedInput-root': { borderRadius: 1 }, mb:2
-                }}
-              />
-              {/* Champ pour le nom */}
-              <TextField
-                fullWidth
-                label="Last Name"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                placeholder="Doe"
-                sx={{
-                  '& .MuiOutlinedInput-root': { borderRadius: 1 },
-                }}
+                label="Username"
+                value={formData.username}
+                onChange={(e) => handleInputChange('username', e.target.value)}
+                placeholder="JohnDoe"
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 } }}
               />
             </Stack>
           </StepContainer>
         )}
 
-        {/* ÉTAPE 2 : Entreprise */}
+        {/* ÉTAPE 2 : Nom de l'entreprise */}
         {currentStep === 2 && (
           <StepContainer
             stepNumber={2}
@@ -316,10 +299,7 @@ export default function OnboardingPage() {
               value={formData.company}
               onChange={(e) => handleInputChange('company', e.target.value)}
               placeholder="Acme Inc."
-              sx={{
-                mb: 4,
-                '& .MuiOutlinedInput-root': { borderRadius: 2 },
-              }}
+              sx={{ mb: 4, '& .MuiOutlinedInput-root': { borderRadius: 1 } }}
             />
           </StepContainer>
         )}
@@ -331,7 +311,7 @@ export default function OnboardingPage() {
             title="What&apos;s your role?"
             description="Select the one that best describes your position"
           >
-            <Stack gap={2} sx={{ mb: 4 }}>
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
               {/* Génère une OptionCard pour chaque rôle disponible */}
               {['Product Manager', 'Designer', 'Developer', 'Entrepreneur', 'Other'].map(
                 (role) => (
@@ -354,7 +334,7 @@ export default function OnboardingPage() {
             title="What industry are you in?"
             description="Help us understand your context"
           >
-            <Stack gap={2} sx={{ mb: 4 }}>
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
               {/* Génère une OptionCard pour chaque industrie disponible */}
               {['Technology', 'Finance', 'Healthcare', 'Retail', 'Other'].map(
                 (industry) => (
@@ -370,14 +350,14 @@ export default function OnboardingPage() {
           </StepContainer>
         )}
 
-        {/* ÉTAPE 5 : Invitation par e-mail (remplace l'étape d'expérience) */}
-        {currentStep === 5 && (
+        {/* ÉTAPE 7 : Invitation par e-mail (optionnelle) */}
+        {currentStep === 7 && (
           <StepContainer
-            stepNumber={5}
+            stepNumber={7}
             title="Invite a colleague"
             description="Invite someone by email to join you"
           >
-            <Stack gap={2} sx={{ mb: 4 }}>
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
               {/* Champ email pour inviter une personne */}
               <TextField
                 fullWidth
@@ -385,7 +365,7 @@ export default function OnboardingPage() {
                 value={formData.inviteEmail}
                 onChange={(e) => handleInputChange('inviteEmail', e.target.value)}
                 placeholder="name@example.com"
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 }, mb: 2 }}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1 }, mb: 2 }}
               />
 
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -414,14 +394,14 @@ export default function OnboardingPage() {
           </StepContainer>
         )}
 
-        {/* ÉTAPE 6 : Objectifs (multi-sélection) */}
-        {currentStep === 6 && (
+        {/* ÉTAPE 5 : Objectifs (multi-sélection) */}
+        {currentStep === 5 && (
           <StepContainer
-            stepNumber={6}
+            stepNumber={5}
             title="What are your primary goals?"
             description="Select all that apply"
           >
-            <Stack gap={2} sx={{ mb: 4 }}>
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
               {/* Génère une OptionCard pour chaque objectif disponible (multi-sélection possible) */}
               {[
                 'Increase productivity',
@@ -433,18 +413,95 @@ export default function OnboardingPage() {
                 <OptionCard
                   key={goal}
                   title={goal}
-                  selected={selectedOptions.goals.includes(goal)} // Vrai si cet objectif est dans le tableau
-                  onClick={() => handleGoalsToggle(goal)} // Ajoute/retire cet objectif du tableau
+                  selected={selectedOptions.goals.includes(goal)}
+                  onClick={() => handleGoalsToggle(goal)}
                 />
               ))}
             </Stack>
           </StepContainer>
         )}
 
-        {/* ÉTAPE 7 : Écran de complétion avec message personnalisé */}
-        {currentStep === 7 && (
+        {/* ÉTAPE 6 : Choix du style */}
+        {currentStep === 6 && (
           <StepContainer
-            stepNumber={7}
+            stepNumber={6}
+            title="Choose your style"
+            description="Pick an interface style that suits you"
+          >
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
+              {['Light', 'Dark'].map((s) => (
+                <OptionCard
+                  key={s}
+                  title={`${s} ${s === 'Light' ? '☀️' : '🌙'}`}
+                  selected={selectedOptions.style === s}
+                  onClick={() => {
+                    handleOptionSelect('style', s)
+                    // applique le thème immédiatement
+                    try {
+                      setMode(s.toLowerCase() as any)
+                    } catch (e) {
+                      console.warn('Theme switch failed', e)
+                    }
+                  }}
+                />
+              ))}
+            </Stack>
+          </StepContainer>
+        )}
+
+        {/* ÉTAPE 8 : Subscribe to updates (toggles + follow) */}
+        {currentStep === 8 && (
+          <StepContainer
+            stepNumber={8}
+            title="Subscribe to updates"
+            description="Stay informed about new features and news"
+          >
+            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 700 }}>Changelog</Typography>
+                  <Typography sx={{ color: '#666', fontSize: '0.9rem' }}>
+                    Receive release notes and platform updates
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={subscribeChangelog}
+                  onChange={(e) => setSubscribeChangelog(e.target.checked)}
+                  color="primary"
+                />
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                  <Typography sx={{ fontWeight: 700 }}>Marketing & onboarding</Typography>
+                  <Typography sx={{ color: '#666', fontSize: '0.9rem' }}>
+                    Helpful tips, growth emails and occasional offers
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={subscribeMarketing}
+                  onChange={(e) => setSubscribeMarketing(e.target.checked)}
+                  color="primary"
+                />
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <Button
+                  variant="outlined"
+                  sx={{ borderRadius: 99, px: 3 }}
+                  onClick={() => window.open('https://twitter.com', '_blank')}
+                >
+                  Follow us on X
+                </Button>
+              </Box>
+            </Stack>
+          </StepContainer>
+        )}
+
+        {/* ÉTAPE 9 : Écran de complétion avec message personnalisé (Open Taskit) */}
+        {currentStep === 9 && (
+          <StepContainer
+            stepNumber={9}
             title="You&apos;re all set!"
             description="Your account has been configured to your preferences"
           >
@@ -458,13 +515,10 @@ export default function OnboardingPage() {
                 mb: 4,
               }}
             >
-              {/* Emoji de célébration */}
               <Typography sx={{ fontSize: '3rem', mb: 2 }}>🎉</Typography>
-              {/* Message de bienvenue personnalisé avec le prénom de l'utilisateur */}
               <Typography sx={{ color: '#666', lineHeight: 1.6 }}>
-                Welcome to our platform, {formData.firstName}! You&apos;re ready to start your
-                journey. We&apos;ll take you to your dashboard where you can explore all the
-                amazing features.
+                Welcome to our platform, {formData.username || 'user'}! You&apos;re ready to start your
+                journey. Click "Open Taskit" to enter your workspace.
               </Typography>
             </Box>
           </StepContainer>
@@ -522,12 +576,12 @@ export default function OnboardingPage() {
                 : {},
             }}
           >
-            {currentStep === TOTAL_STEPS ? 'Get Started' : 'Continue'}
+            {currentStep === TOTAL_STEPS ? 'Open Taskit' : 'Continue'}
           </Button>
         </Box>
 
         {/* Bouton "Skip for now" : visible uniquement aux étapes 1 et 2 pour sauter les infos optionnelles */}
-        {currentStep < 3 && (
+          {currentStep <= 2 && (
           <Box sx={{ textAlign: 'center', mt: 3 }}>
             <Button
               variant="text"

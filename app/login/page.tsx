@@ -24,10 +24,9 @@ export default function LoginPage() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleLogin = () => {
     setLoading(true)
-    // Simulate login - in real app would call API
+    // Simulate Microsoft SSO flow
     setTimeout(() => {
       setLoading(false)
       router.push('/onboarding')
@@ -91,6 +90,9 @@ export default function LoginPage() {
             >
               Get started with your premium experience
             </Typography>
+            <Box sx={{ mt: 3 }}>
+              <Image src="/login.svg" alt="Login art" width={300} height={220} />
+            </Box>
           </Box>
         </Box>
       )}
@@ -110,125 +112,66 @@ export default function LoginPage() {
           elevation={0}
           sx={{
             width: '100%',
-            maxWidth: '420px',
+            maxWidth: '520px',
             p: 4,
-            borderRadius: 3,
+            borderRadius: 2,
             background: 'white',
           }}
         >
-          {/* Logo */}
-          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-            <Image
-              src="/logo-square.svg"
-              alt="Logo"
-              width={60}
-              height={60}
-            />
+          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <Image src="/logo-square.svg" alt="Logo" width={68} height={68} />
           </Box>
 
-          <Typography
-            variant="h3"
-            sx={{
-              mb: 1,
-              textAlign: 'center',
-              fontWeight: 700,
-              color: '#1a1a1a',
-            }}
-          >
-            Sign In
-          </Typography>
-          <Typography
-            sx={{
-              mb: 4,
-              textAlign: 'center',
-              color: '#666',
-              fontSize: '0.95rem',
-            }}
-          >
-            Enter your credentials to continue
+          <Typography variant="h3" sx={{ mb: 1, textAlign: 'center', fontWeight: 700, color: '#1a1a1a' }}>
+            Welcome to Taskit
           </Typography>
 
-          <Box component="form" onSubmit={handleLogin}>
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              margin="normal"
-              placeholder="your@email.com"
-              required
-              sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              margin="normal"
-              placeholder="••••••••"
-              required
-              sx={{
-                mb: 1,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
-            />
-            <Box sx={{ mb: 3, textAlign: 'right' }}>
-              <Link
-                href="#"
-                sx={{
-                  fontSize: '0.85rem',
-                  color: '#F8A01B',
-                  textDecoration: 'none',
-                  '&:hover': { textDecoration: 'underline' },
-                }}
-              >
-                Forgot password?
-              </Link>
-            </Box>
+          <Typography sx={{ mb: 3, textAlign: 'center', color: '#666', fontSize: '0.95rem' }}>
+            Sign in with your Microsoft account to continue. Your organization uses Azure AD for secure single sign-on.
+          </Typography>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+            <Image src="/login.svg" alt="Login art" width={420} height={300} />
+          </Box>
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography sx={{ color: '#444', fontSize: '0.9rem', mb: 2 }}>
+              Secure sign-in via Azure Active Directory
+            </Typography>
 
             <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                py: 1.5,
-                mb: 2,
-                background: '#F8A01B',
-                color: 'white',
-                '&:hover': { background: '#E09015' },
-                borderRadius: 2,
-                fontSize: '1rem',
-                fontWeight: 600,
-              }}
-              type="submit"
+              onClick={handleLogin}
               disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Box>
-
-          <Typography sx={{ textAlign: 'center', color: '#666', mb: 2 }}>
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/register"
               sx={{
-                color: '#F8A01B',
-                fontWeight: 600,
-                textDecoration: 'none',
-                '&:hover': { textDecoration: 'underline' },
+                minWidth: 260,
+                py: 1.5,
+                px: 4,
+                background: '#0078D4',
+                color: 'white',
+                borderRadius: 99,
+                fontWeight: 700,
+                textTransform: 'none',
+                boxShadow: loading ? '0 6px 18px rgba(0,120,212,0.24)' : 'none',
+                transition: 'all 220ms ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Sign up
-            </Link>
-          </Typography>
+              {!loading ? (
+                'Sign in with Microsoft'
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: 'white', opacity: 0.95, animation: 'pulse 1s infinite', '@keyframes pulse': { '0%': { transform: 'scale(1)', opacity: 0.95 }, '50%': { transform: 'scale(1.4)', opacity: 0.6 }, '100%': { transform: 'scale(1)', opacity: 0.95 } } }} />
+                  <Box component="span">Signing in…</Box>
+                </Box>
+              )}
+            </Button>
+
+            <Typography sx={{ mt: 3, color: '#999', fontSize: '0.85rem' }}>
+              By continuing you agree to your organization&apos;s sign-in policy.
+            </Typography>
+          </Box>
         </Paper>
       </Box>
     </Box>
