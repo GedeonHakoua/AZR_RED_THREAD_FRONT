@@ -32,7 +32,8 @@ export default function RootLayout({
         },
       },
       typography: {
-        fontFamily: 'Figtree, sans-serif',
+        fontFamily:
+          'Figtree, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
         h1: { fontSize: '2.5rem', fontWeight: 700, letterSpacing: '-0.02em' },
         h2: { fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.01em' },
         h3: { fontSize: '1.5rem', fontWeight: 600 },

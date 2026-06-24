@@ -35,69 +35,7 @@ export default function LoginPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex' }}>
-      {/* Left side - Image */}
-      {!isMobile && (
-        <Box
-          sx={{
-            flex: 1,
-            background: 'linear-gradient(135deg, #A445C7 0%, #8A3AAE 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <Box
-            sx={{
-              position: 'absolute',
-              width: '400px',
-              height: '400px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.1)',
-              top: '-100px',
-              right: '-100px',
-            }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              width: '300px',
-              height: '300px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.05)',
-              bottom: '-100px',
-              left: '50px',
-            }}
-          />
-          <Box sx={{ textAlign: 'center', zIndex: 1 }}>
-            <Typography
-              sx={{
-                color: 'white',
-                fontSize: '3rem',
-                fontWeight: 700,
-                mb: 2,
-              }}
-            >
-              Welcome Back
-            </Typography>
-            <Typography
-              sx={{
-                color: 'rgba(255, 255, 255, 0.9)',
-                fontSize: '1.1rem',
-                fontWeight: 400,
-              }}
-            >
-              Get started with your premium experience
-            </Typography>
-            <Box sx={{ mt: 3 }}>
-              <Image src="/login.svg" alt="Login art" width={300} height={220} />
-            </Box>
-          </Box>
-        </Box>
-      )}
-
-      {/* Right side - Login Form */}
+      {/* Right side - Login Form (full width; left welcome removed) */}
       <Box
         sx={{
           flex: 1,
@@ -151,19 +89,40 @@ export default function LoginPage() {
                 borderRadius: 99,
                 fontWeight: 700,
                 textTransform: 'none',
-                boxShadow: loading ? '0 6px 18px rgba(0,120,212,0.24)' : 'none',
-                transition: 'all 220ms ease',
+                boxShadow: loading ? '0 6px 18px rgba(0,120,212,0.18)' : '0 6px 18px rgba(0,0,0,0.06)',
+                transition: 'transform 260ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms ease, opacity 180ms ease',
+                '&:hover': {
+                  transform: 'translateY(-2px) scale(1.01)',
+                  boxShadow: '0 10px 26px rgba(0,0,0,0.12)'
+                },
+                '&:active': { transform: 'translateY(0) scale(0.995)' },
+                '&.Mui-disabled': { opacity: 0.9, transform: 'none' },
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
               {!loading ? (
-                'Sign in with Microsoft'
-              ) : (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: 'white', opacity: 0.95, animation: 'pulse 1s infinite', '@keyframes pulse': { '0%': { transform: 'scale(1)', opacity: 0.95 }, '50%': { transform: 'scale(1.4)', opacity: 0.6 }, '100%': { transform: 'scale(1)', opacity: 0.95 } } }} />
-                  <Box component="span">Signing in…</Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1 }}>
+                    {/* Inline Microsoft logo - four squares */}
+                    <Box component="span" sx={{ width: 18, height: 18, display: 'inline-block' }} aria-hidden>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="10" height="10" rx="1" fill="#F35325" />
+                        <rect x="12" y="2" width="10" height="10" rx="1" fill="#81BC06" />
+                        <rect x="2" y="12" width="10" height="10" rx="1" fill="#05A6F0" />
+                        <rect x="12" y="12" width="10" height="10" rx="1" fill="#FFD700" />
+                      </svg>
+                    </Box>
+                  </Box>
+                  <Box component="span">Sign in with Microsoft</Box>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} aria-live="polite">
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 0.5 }}>
+                    <Image src="/Loader.svg" alt="loader" width={18} height={18} />
+                  </Box>
+                  <Box component="span">Chargement...</Box>
                 </Box>
               )}
             </Button>

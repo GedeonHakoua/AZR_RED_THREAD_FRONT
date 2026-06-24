@@ -167,6 +167,7 @@ export default function OnboardingPage() {
     setTimeout(() => {
       router.push('/dashboard')
     }, 5000)
+    // }, 100000)
   }
 
   // Si en cours de finalisation, afficher la page de chargement stylée
@@ -376,12 +377,13 @@ export default function OnboardingPage() {
                   sx={{
                     px: 3,
                     py: 1.2,
-                    background: inviteSent ? '#DDD' : '#F8A01B',
+                    background: inviteSent ? '#DDD' : '#A445C7',
                     color: inviteSent ? '#999' : 'white',
                     borderRadius: 2,
                     fontWeight: 600,
                   }}
                 >
+
                   {inviteSent ? 'Invited' : 'Send invite'}
                 </Button>
                 {inviteSent && (
@@ -428,24 +430,43 @@ export default function OnboardingPage() {
             title="Choose your style"
             description="Pick an interface style that suits you"
           >
-            <Stack sx={{ mb: 4, gap: 2, display: 'flex', flexDirection: 'column' }}>
-              {['Light', 'Dark'].map((s) => (
-                <OptionCard
-                  key={s}
-                  title={`${s} ${s === 'Light' ? '☀️' : '🌙'}`}
-                  selected={selectedOptions.style === s}
-                  onClick={() => {
-                    handleOptionSelect('style', s)
-                    // applique le thème immédiatement
-                    try {
-                      setMode(s.toLowerCase() as any)
-                    } catch (e) {
-                      console.warn('Theme switch failed', e)
-                    }
-                  }}
-                />
-              ))}
-            </Stack>
+            <Box sx={{ mb: 4 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 2,
+                  alignItems: 'stretch',
+                  justifyContent: 'center',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                }}
+              >
+                {['Light', 'Dark'].map((s) => (
+                  <Box key={s} sx={{ flex: 1, minWidth: 0 }}>
+                    <OptionCard
+                      title={
+                        <>
+                          <Box component="span" sx={{ mr: 1 }}>{s}</Box>
+                          <Box component="span" aria-hidden>{s === 'Light'}</Box>
+                        </>
+                      }
+                      selected={selectedOptions.style === s}
+                      onClick={() => {
+                        handleOptionSelect('style', s)
+                        // applique le thème immédiatement
+                        try {
+                          setMode(s.toLowerCase() as any)
+                        } catch (e) {
+                          console.warn('Theme switch failed', e)
+                        }
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+              <Box sx={{ mt: 3, textAlign: 'center' }}>
+             
+              </Box>
+            </Box>
           </StepContainer>
         )}
 
@@ -580,8 +601,8 @@ export default function OnboardingPage() {
           </Button>
         </Box>
 
-        {/* Bouton "Skip for now" : visible uniquement aux étapes 1 et 2 pour sauter les infos optionnelles */}
-          {currentStep <= 2 && (
+        {/* Bouton "Skip for now" : visible à toutes les étapes*/}
+          {currentStep <= 7 && (
           <Box sx={{ textAlign: 'center', mt: 3 }}>
             <Button
               variant="text"

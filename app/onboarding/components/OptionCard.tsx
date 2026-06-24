@@ -4,7 +4,7 @@ import { Box, Card, Typography, useTheme, useMediaQuery } from '@mui/material'
 import { ReactNode } from 'react'
 
 interface OptionCardProps {
-  title: string
+  title: React.ReactNode
   description?: string
   icon?: ReactNode
   selected?: boolean
@@ -26,7 +26,7 @@ export default function OptionCard({
       onClick={onClick}
       sx={{
         p: 3,
-        mb: 1,
+        mb: -1,
         cursor: onClick ? 'pointer' : 'default',
         borderRadius: 1.5,
         border: selected ? '2px solid #F8A01B' : '1px solid #E0E0E0',
@@ -35,7 +35,7 @@ export default function OptionCard({
         '&:hover': onClick
           ? {
               borderColor: '#F8A01B',
-              transform: 'translateY(-4px)',
+              // transform: 'translateY(-4px)',
               boxShadow: '0 12px 24px rgba(248, 160, 27, 0.15)',
             }
           : {},
