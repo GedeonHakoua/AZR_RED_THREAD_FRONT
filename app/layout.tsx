@@ -7,7 +7,10 @@ import '@fontsource/figtree/400.css'
 import '@fontsource/figtree/500.css'
 import '@fontsource/figtree/600.css'
 import '@fontsource/figtree/700.css'
-import ThemeContext, { ThemeMode } from '../lib/ThemeContext'
+import ThemeContext, { type ThemeMode } from '@/utils/lib/ThemeContext'
+import { MsalProvider } from '@azure/msal-react'
+import { msalInstance } from '@/utils/msalConfig'
+import { AuthProvider } from '@/utils/Protectedroute'
 
 export default function RootLayout({
   children,
@@ -53,17 +56,21 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <title>Taskit Onboarding</title>
-        <meta name="description" content="Modern onboarding experience" />
+        <meta name="description" content="Taskit | onboarding" />
         <meta name="theme-color" content="#F8A01B" />
       </head>
       <body style={{ margin: 0, padding: 0 }}>
-        <ThemeContext.Provider value={{ mode, setMode }}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-            {process.env.NODE_ENV === 'production' && <Analytics />}
-          </ThemeProvider>
-        </ThemeContext.Provider>
+        <MsalProvider instance={msalInstance}>
+          <AuthProvider>
+            <ThemeContext.Provider value={{ mode, setMode }}>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                {children}
+                {process.env.NODE_ENV === 'production' && <Analytics />}
+              </ThemeProvider>
+            </ThemeContext.Provider>
+          </AuthProvider>
+        </MsalProvider>
       </body>
     </html>
   )

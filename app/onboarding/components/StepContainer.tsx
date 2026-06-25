@@ -25,13 +25,15 @@ export default function StepContainer({
         p: { xs: 3, md: 5 },
         borderRadius: 3,
         background: 'white',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
         animation: 'fadeIn 0.5s ease-in-out',
         '@keyframes fadeIn': {
           from: { opacity: 0, transform: 'translateY(20px)' },
           to: { opacity: 1, transform: 'translateY(0)' },
         },
       }}
-    >
+    > 
+    {/* Chiffre dans le rond orange */}
       <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
         <Box
           sx={{
@@ -49,6 +51,8 @@ export default function StepContainer({
         >
           {stepNumber}
         </Box>
+
+        {/* Step ... of ... */}
         <Typography sx={{ color: '#999', fontSize: '0.9rem' }}>
           Step {stepNumber} of 7
         </Typography>
@@ -66,6 +70,7 @@ export default function StepContainer({
         {title}
       </Typography>
 
+{/* Description */}
       {description && (
         <Typography
           sx={{

@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { useState, useContext } from 'react'
 import { useRouter } from 'next/navigation'
-import ThemeContext from '../../lib/ThemeContext'
+import ThemeContext from '@/utils/lib/ThemeContext'
 // Imports des composants locaux personnalisés pour l'onboarding
 import StepContainer from './components/StepContainer' // Wrapper pour chaque étape (titre + description)
 import ProgressIndicator from './components/ProgressIndicator' // Indicateur de progression visuel

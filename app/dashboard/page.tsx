@@ -3,11 +3,19 @@
 import { Box, Button, Container, Typography, Paper, Grid } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import '../globals.css'
+import { useMsal } from '@azure/msal-react'
+
 
 export default function DashboardPage() {
   const router = useRouter()
 
+  const { accounts } = useMsal()
+  console.log('Comptes MSAL :', accounts)
+  console.log('Connecté :', accounts.length > 0)
+  console.log('Email :', accounts[0]?.username)
   return (
+    
     <Box sx={{ minHeight: '100vh', background: '#F5F5F5', py: 6 }}>
       <Container maxWidth="lg">
         {/* Header */}
@@ -68,7 +76,7 @@ export default function DashboardPage() {
             { title: 'Team', description: 'Manage your team members' },
             { title: 'Reports', description: 'Generate detailed reports' },
           ].map((feature, idx) => (
-            <Grid item xs={12} sm={6} key={idx}>
+            <Grid size={{ xs: 12, sm: 6 }} key={idx}>
               <Paper
                 elevation={0}
                 sx={{
@@ -105,6 +113,7 @@ export default function DashboardPage() {
             background: 'white',
             border: '1px solid #E0E0E0',
             textAlign: 'center',
+            
           }}
         >
           <Typography sx={{ mb: 3, color: '#666' }}>

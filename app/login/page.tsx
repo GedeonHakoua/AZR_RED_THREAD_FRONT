@@ -15,6 +15,8 @@ import {
 import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useMsal } from '@azure/msal-react'
+import { loginRequest } from '@/utils/msalConfig'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -23,14 +25,14 @@ export default function LoginPage() {
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { instance } = useMsal()
 
   const handleLogin = () => {
     setLoading(true)
-    // Simulate Microsoft SSO flow
-    setTimeout(() => {
+    instance.loginRedirect(loginRequest).catch((error) => {
+      console.error("Erreur de connexion MSAL :", error)
       setLoading(false)
-      router.push('/onboarding')
-    }, 1000)
+    })
   }
 
   return (
@@ -54,6 +56,7 @@ export default function LoginPage() {
             p: 4,
             borderRadius: 2,
             background: 'white',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           }}
         >
           <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
@@ -64,7 +67,7 @@ export default function LoginPage() {
             Welcome to Taskit
           </Typography>
 
-          <Typography sx={{ mb: 3, textAlign: 'center', color: '#666', fontSize: '0.95rem' }}>
+          <Typography sx={{ mb: 3, textAlign: 'center', color: '#666', fontSize: '0.95rem', }}>
             Sign in with your Microsoft account to continue. Your organization uses Azure AD for secure single sign-on.
           </Typography>
 
@@ -93,7 +96,8 @@ export default function LoginPage() {
                 transition: 'transform 260ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms ease, opacity 180ms ease',
                 '&:hover': {
                   transform: 'translateY(-2px) scale(1.01)',
-                  boxShadow: '0 10px 26px rgba(0,0,0,0.12)'
+                  // boxShadow: '0 10px 26px rgba(0,0,0,0.12)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
                 },
                 '&:active': { transform: 'translateY(0) scale(0.995)' },
                 '&.Mui-disabled': { opacity: 0.9, transform: 'none' },
@@ -103,8 +107,8 @@ export default function LoginPage() {
               }}
             >
               {!loading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1,  }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1,  }}>
                     {/* Inline Microsoft logo - four squares */}
                     <Box component="span" sx={{ width: 18, height: 18, display: 'inline-block' }} aria-hidden>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
